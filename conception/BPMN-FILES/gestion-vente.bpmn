@@ -1,0 +1,483 @@
+<?xml version='1.0' encoding='utf-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_Vente_v2" targetNamespace="https://example.org/erp/gestion-vente">
+  <bpmn:process id="Process_Vente" name="Gestion de vente : scénario paramétrable" isExecutable="false">
+    <bpmn:startEvent id="Start" name="Demande client reçue">
+      <bpmn:outgoing>Flow_0</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Demande" name="Enregistrer la demande">
+      <bpmn:incoming>Flow_0</bpmn:incoming>
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="StockReq" name="Vérification du stock nécessaire ?">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="StockMerge">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:incoming>Flow_17</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Stock" name="Consulter la disponibilité">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Disponible" name="Produits disponibles ?">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Informer" name="Informer le client et examiner les options">
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Attendre" name="Le client souhaite attendre ?">
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+      <bpmn:outgoing>Flow_9</bpmn:outgoing>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="Cancel" name="Demande abandonnée">
+      <bpmn:incoming>Flow_9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="AchatActive" name="Intégration Achat active ?">
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+      <bpmn:outgoing>Flow_12</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Achat" name="Transmettre une demande à Gestion d’achat">
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="ManuelAchat" name="Organiser le réapprovisionnement externe">
+      <bpmn:incoming>Flow_12</bpmn:incoming>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="AchatMerge">
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+      <bpmn:outgoing>Flow_15</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Pending" name="Mettre la demande en attente">
+      <bpmn:incoming>Flow_15</bpmn:incoming>
+      <bpmn:outgoing>Flow_16</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="StockRecu" name="Notification de disponibilité reçue">
+      <bpmn:incoming>Flow_16</bpmn:incoming>
+      <bpmn:outgoing>Flow_17</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEvent_StockRecu" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:exclusiveGateway id="VenteMerge">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_18</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="DevisReq" name="Devis requis ?">
+      <bpmn:incoming>Flow_18</bpmn:incoming>
+      <bpmn:outgoing>Flow_19</bpmn:outgoing>
+      <bpmn:outgoing>Flow_20</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Devis" name="Préparer et envoyer le devis">
+      <bpmn:incoming>Flow_19</bpmn:incoming>
+      <bpmn:outgoing>Flow_21</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Accept" name="Devis accepté ?">
+      <bpmn:incoming>Flow_21</bpmn:incoming>
+      <bpmn:outgoing>Flow_22</bpmn:outgoing>
+      <bpmn:outgoing>Flow_23</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="Rejected" name="Devis refusé">
+      <bpmn:incoming>Flow_22</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="CommandeMerge">
+      <bpmn:incoming>Flow_20</bpmn:incoming>
+      <bpmn:incoming>Flow_23</bpmn:incoming>
+      <bpmn:outgoing>Flow_24</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Commande" name="Enregistrer et confirmer la commande">
+      <bpmn:incoming>Flow_24</bpmn:incoming>
+      <bpmn:outgoing>Flow_25</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Physical" name="Livraison physique nécessaire ?">
+      <bpmn:incoming>Flow_25</bpmn:incoming>
+      <bpmn:outgoing>Flow_26</bpmn:outgoing>
+      <bpmn:outgoing>Flow_27</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="LogActive" name="Intégration Logistique active ?">
+      <bpmn:incoming>Flow_27</bpmn:incoming>
+      <bpmn:outgoing>Flow_28</bpmn:outgoing>
+      <bpmn:outgoing>Flow_29</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Log" name="Transmettre la commande à Logistique">
+      <bpmn:incoming>Flow_28</bpmn:incoming>
+      <bpmn:outgoing>Flow_30</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="LogManual" name="Organiser la livraison hors module Logistique">
+      <bpmn:incoming>Flow_29</bpmn:incoming>
+      <bpmn:outgoing>Flow_31</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="LogMerge">
+      <bpmn:incoming>Flow_30</bpmn:incoming>
+      <bpmn:incoming>Flow_31</bpmn:incoming>
+      <bpmn:outgoing>Flow_32</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="DeliveryMerge">
+      <bpmn:incoming>Flow_26</bpmn:incoming>
+      <bpmn:incoming>Flow_32</bpmn:incoming>
+      <bpmn:outgoing>Flow_33</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Billing" name="Établir la facture selon la politique choisie">
+      <bpmn:incoming>Flow_33</bpmn:incoming>
+      <bpmn:outgoing>Flow_34</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="AccountingActive" name="Intégration Comptabilité active ?">
+      <bpmn:incoming>Flow_34</bpmn:incoming>
+      <bpmn:outgoing>Flow_35</bpmn:outgoing>
+      <bpmn:outgoing>Flow_36</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Accounting" name="Transmettre la facture à Comptabilité">
+      <bpmn:incoming>Flow_35</bpmn:incoming>
+      <bpmn:outgoing>Flow_37</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="AccountingManual" name="Organiser le traitement comptable externe">
+      <bpmn:incoming>Flow_36</bpmn:incoming>
+      <bpmn:outgoing>Flow_38</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="AccountingMerge">
+      <bpmn:incoming>Flow_37</bpmn:incoming>
+      <bpmn:incoming>Flow_38</bpmn:incoming>
+      <bpmn:outgoing>Flow_39</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="End" name="Traitement commercial terminé">
+      <bpmn:incoming>Flow_39</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0" sourceRef="Start" targetRef="Demande" />
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="Demande" targetRef="StockReq" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="StockReq" targetRef="StockMerge" name="Oui" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="StockReq" targetRef="VenteMerge" name="Non" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="StockMerge" targetRef="Stock" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Stock" targetRef="Disponible" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Disponible" targetRef="VenteMerge" name="Oui" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Disponible" targetRef="Informer" name="Non" />
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Informer" targetRef="Attendre" />
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Attendre" targetRef="Cancel" name="Non" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Attendre" targetRef="AchatActive" name="Oui" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="AchatActive" targetRef="Achat" name="Oui" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="AchatActive" targetRef="ManuelAchat" name="Non" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Achat" targetRef="AchatMerge" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="ManuelAchat" targetRef="AchatMerge" />
+    <bpmn:sequenceFlow id="Flow_15" sourceRef="AchatMerge" targetRef="Pending" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Pending" targetRef="StockRecu" />
+    <bpmn:sequenceFlow id="Flow_17" sourceRef="StockRecu" targetRef="StockMerge" />
+    <bpmn:sequenceFlow id="Flow_18" sourceRef="VenteMerge" targetRef="DevisReq" />
+    <bpmn:sequenceFlow id="Flow_19" sourceRef="DevisReq" targetRef="Devis" name="Oui" />
+    <bpmn:sequenceFlow id="Flow_20" sourceRef="DevisReq" targetRef="CommandeMerge" name="Non" />
+    <bpmn:sequenceFlow id="Flow_21" sourceRef="Devis" targetRef="Accept" />
+    <bpmn:sequenceFlow id="Flow_22" sourceRef="Accept" targetRef="Rejected" name="Non" />
+    <bpmn:sequenceFlow id="Flow_23" sourceRef="Accept" targetRef="CommandeMerge" name="Oui" />
+    <bpmn:sequenceFlow id="Flow_24" sourceRef="CommandeMerge" targetRef="Commande" />
+    <bpmn:sequenceFlow id="Flow_25" sourceRef="Commande" targetRef="Physical" />
+    <bpmn:sequenceFlow id="Flow_26" sourceRef="Physical" targetRef="DeliveryMerge" name="Non" />
+    <bpmn:sequenceFlow id="Flow_27" sourceRef="Physical" targetRef="LogActive" name="Oui" />
+    <bpmn:sequenceFlow id="Flow_28" sourceRef="LogActive" targetRef="Log" name="Oui" />
+    <bpmn:sequenceFlow id="Flow_29" sourceRef="LogActive" targetRef="LogManual" name="Non" />
+    <bpmn:sequenceFlow id="Flow_30" sourceRef="Log" targetRef="LogMerge" />
+    <bpmn:sequenceFlow id="Flow_31" sourceRef="LogManual" targetRef="LogMerge" />
+    <bpmn:sequenceFlow id="Flow_32" sourceRef="LogMerge" targetRef="DeliveryMerge" />
+    <bpmn:sequenceFlow id="Flow_33" sourceRef="DeliveryMerge" targetRef="Billing" />
+    <bpmn:sequenceFlow id="Flow_34" sourceRef="Billing" targetRef="AccountingActive" />
+    <bpmn:sequenceFlow id="Flow_35" sourceRef="AccountingActive" targetRef="Accounting" name="Oui" />
+    <bpmn:sequenceFlow id="Flow_36" sourceRef="AccountingActive" targetRef="AccountingManual" name="Non" />
+    <bpmn:sequenceFlow id="Flow_37" sourceRef="Accounting" targetRef="AccountingMerge" />
+    <bpmn:sequenceFlow id="Flow_38" sourceRef="AccountingManual" targetRef="AccountingMerge" />
+    <bpmn:sequenceFlow id="Flow_39" sourceRef="AccountingMerge" targetRef="End" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_Vente">
+    <bpmndi:BPMNPlane id="Plane_Vente" bpmnElement="Process_Vente">
+      <bpmndi:BPMNShape id="Shape_Start" bpmnElement="Start">
+        <dc:Bounds x="50" y="482" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Demande" bpmnElement="Demande">
+        <dc:Bounds x="130" y="460" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StockReq" bpmnElement="StockReq">
+        <dc:Bounds x="340" y="475" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StockMerge" bpmnElement="StockMerge">
+        <dc:Bounds x="450" y="290" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Stock" bpmnElement="Stock">
+        <dc:Bounds x="550" y="275" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Disponible" bpmnElement="Disponible">
+        <dc:Bounds x="760" y="290" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Informer" bpmnElement="Informer">
+        <dc:Bounds x="880" y="150" width="155" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Attendre" bpmnElement="Attendre">
+        <dc:Bounds x="1100" y="165" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Cancel" bpmnElement="Cancel">
+        <dc:Bounds x="1107" y="305" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_AchatActive" bpmnElement="AchatActive">
+        <dc:Bounds x="1220" y="165" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Achat" bpmnElement="Achat">
+        <dc:Bounds x="1340" y="75" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ManuelAchat" bpmnElement="ManuelAchat">
+        <dc:Bounds x="1340" y="215" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_AchatMerge" bpmnElement="AchatMerge">
+        <dc:Bounds x="1560" y="165" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Pending" bpmnElement="Pending">
+        <dc:Bounds x="1660" y="150" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_StockRecu" bpmnElement="StockRecu">
+        <dc:Bounds x="1870" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_VenteMerge" bpmnElement="VenteMerge">
+        <dc:Bounds x="880" y="475" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DevisReq" bpmnElement="DevisReq">
+        <dc:Bounds x="1020" y="475" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Devis" bpmnElement="Devis">
+        <dc:Bounds x="1140" y="350" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Accept" bpmnElement="Accept">
+        <dc:Bounds x="1350" y="365" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Rejected" bpmnElement="Rejected">
+        <dc:Bounds x="1357" y="240" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CommandeMerge" bpmnElement="CommandeMerge">
+        <dc:Bounds x="1500" y="475" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Commande" bpmnElement="Commande">
+        <dc:Bounds x="1600" y="460" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Physical" bpmnElement="Physical">
+        <dc:Bounds x="1820" y="475" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_LogActive" bpmnElement="LogActive">
+        <dc:Bounds x="1940" y="600" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Log" bpmnElement="Log">
+        <dc:Bounds x="2070" y="555" width="155" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_LogManual" bpmnElement="LogManual">
+        <dc:Bounds x="2070" y="675" width="155" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_LogMerge" bpmnElement="LogMerge">
+        <dc:Bounds x="2280" y="600" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DeliveryMerge" bpmnElement="DeliveryMerge">
+        <dc:Bounds x="2380" y="475" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Billing" bpmnElement="Billing">
+        <dc:Bounds x="2480" y="460" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_AccountingActive" bpmnElement="AccountingActive">
+        <dc:Bounds x="2700" y="475" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Accounting" bpmnElement="Accounting">
+        <dc:Bounds x="2820" y="385" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_AccountingManual" bpmnElement="AccountingManual">
+        <dc:Bounds x="2820" y="540" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_AccountingMerge" bpmnElement="AccountingMerge">
+        <dc:Bounds x="3040" y="475" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_End" bpmnElement="End">
+        <dc:Bounds x="3150" y="482" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_0" bpmnElement="Flow_0">
+        <di:waypoint x="86" y="500" />
+        <di:waypoint x="130" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_1" bpmnElement="Flow_1">
+        <di:waypoint x="280" y="500" />
+        <di:waypoint x="340" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_2" bpmnElement="Flow_2">
+        <di:waypoint x="365" y="475" />
+        <di:waypoint x="365" y="315" />
+        <di:waypoint x="450" y="315" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_3" bpmnElement="Flow_3">
+        <di:waypoint x="390" y="500" />
+        <di:waypoint x="880" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_4" bpmnElement="Flow_4">
+        <di:waypoint x="500" y="315" />
+        <di:waypoint x="550" y="315" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_5" bpmnElement="Flow_5">
+        <di:waypoint x="700" y="315" />
+        <di:waypoint x="760" y="315" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_6" bpmnElement="Flow_6">
+        <di:waypoint x="785" y="340" />
+        <di:waypoint x="785" y="500" />
+        <di:waypoint x="880" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_7" bpmnElement="Flow_7">
+        <di:waypoint x="785" y="290" />
+        <di:waypoint x="785" y="190" />
+        <di:waypoint x="880" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_8" bpmnElement="Flow_8">
+        <di:waypoint x="1035" y="190" />
+        <di:waypoint x="1100" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_9" bpmnElement="Flow_9">
+        <di:waypoint x="1125" y="215" />
+        <di:waypoint x="1125" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_10" bpmnElement="Flow_10">
+        <di:waypoint x="1150" y="190" />
+        <di:waypoint x="1220" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_11" bpmnElement="Flow_11">
+        <di:waypoint x="1245" y="165" />
+        <di:waypoint x="1245" y="115" />
+        <di:waypoint x="1340" y="115" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_12" bpmnElement="Flow_12">
+        <di:waypoint x="1245" y="215" />
+        <di:waypoint x="1245" y="255" />
+        <di:waypoint x="1340" y="255" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_13" bpmnElement="Flow_13">
+        <di:waypoint x="1500" y="115" />
+        <di:waypoint x="1585" y="115" />
+        <di:waypoint x="1585" y="165" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_14" bpmnElement="Flow_14">
+        <di:waypoint x="1500" y="255" />
+        <di:waypoint x="1585" y="255" />
+        <di:waypoint x="1585" y="215" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_15" bpmnElement="Flow_15">
+        <di:waypoint x="1610" y="190" />
+        <di:waypoint x="1660" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_16" bpmnElement="Flow_16">
+        <di:waypoint x="1810" y="190" />
+        <di:waypoint x="1870" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_17" bpmnElement="Flow_17">
+        <di:waypoint x="1888" y="172" />
+        <di:waypoint x="1888" y="20" />
+        <di:waypoint x="475" y="20" />
+        <di:waypoint x="475" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_18" bpmnElement="Flow_18">
+        <di:waypoint x="930" y="500" />
+        <di:waypoint x="1020" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_19" bpmnElement="Flow_19">
+        <di:waypoint x="1045" y="475" />
+        <di:waypoint x="1045" y="390" />
+        <di:waypoint x="1140" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_20" bpmnElement="Flow_20">
+        <di:waypoint x="1070" y="500" />
+        <di:waypoint x="1500" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_21" bpmnElement="Flow_21">
+        <di:waypoint x="1290" y="390" />
+        <di:waypoint x="1350" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_22" bpmnElement="Flow_22">
+        <di:waypoint x="1375" y="365" />
+        <di:waypoint x="1375" y="276" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_23" bpmnElement="Flow_23">
+        <di:waypoint x="1400" y="390" />
+        <di:waypoint x="1525" y="390" />
+        <di:waypoint x="1525" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_24" bpmnElement="Flow_24">
+        <di:waypoint x="1550" y="500" />
+        <di:waypoint x="1600" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_25" bpmnElement="Flow_25">
+        <di:waypoint x="1760" y="500" />
+        <di:waypoint x="1820" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_26" bpmnElement="Flow_26">
+        <di:waypoint x="1870" y="500" />
+        <di:waypoint x="2380" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_27" bpmnElement="Flow_27">
+        <di:waypoint x="1845" y="525" />
+        <di:waypoint x="1845" y="625" />
+        <di:waypoint x="1940" y="625" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_28" bpmnElement="Flow_28">
+        <di:waypoint x="1990" y="625" />
+        <di:waypoint x="2030" y="625" />
+        <di:waypoint x="2030" y="595" />
+        <di:waypoint x="2070" y="595" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_29" bpmnElement="Flow_29">
+        <di:waypoint x="1965" y="650" />
+        <di:waypoint x="1965" y="715" />
+        <di:waypoint x="2070" y="715" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_30" bpmnElement="Flow_30">
+        <di:waypoint x="2225" y="595" />
+        <di:waypoint x="2260" y="595" />
+        <di:waypoint x="2260" y="625" />
+        <di:waypoint x="2280" y="625" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_31" bpmnElement="Flow_31">
+        <di:waypoint x="2225" y="715" />
+        <di:waypoint x="2305" y="715" />
+        <di:waypoint x="2305" y="650" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_32" bpmnElement="Flow_32">
+        <di:waypoint x="2330" y="625" />
+        <di:waypoint x="2405" y="625" />
+        <di:waypoint x="2405" y="525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_33" bpmnElement="Flow_33">
+        <di:waypoint x="2430" y="500" />
+        <di:waypoint x="2480" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_34" bpmnElement="Flow_34">
+        <di:waypoint x="2640" y="500" />
+        <di:waypoint x="2700" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_35" bpmnElement="Flow_35">
+        <di:waypoint x="2725" y="475" />
+        <di:waypoint x="2725" y="425" />
+        <di:waypoint x="2820" y="425" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_36" bpmnElement="Flow_36">
+        <di:waypoint x="2725" y="525" />
+        <di:waypoint x="2725" y="580" />
+        <di:waypoint x="2820" y="580" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_37" bpmnElement="Flow_37">
+        <di:waypoint x="2980" y="425" />
+        <di:waypoint x="3065" y="425" />
+        <di:waypoint x="3065" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_38" bpmnElement="Flow_38">
+        <di:waypoint x="2980" y="580" />
+        <di:waypoint x="3065" y="580" />
+        <di:waypoint x="3065" y="525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_39" bpmnElement="Flow_39">
+        <di:waypoint x="3090" y="500" />
+        <di:waypoint x="3150" y="500" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

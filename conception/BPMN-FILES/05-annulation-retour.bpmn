@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='utf-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Defs" targetNamespace="https://example.org/erp/ventes">
+  <bpmn:process id="Processus" name="Annulation ou retour après vente" isExecutable="false">
+    <bpmn:startEvent id="s" name="Demande reçue">
+      <bpmn:outgoing>F0</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="review" name="Identifier la commande et vérifier la demande">
+      <bpmn:incoming>F0</bpmn:incoming>
+      <bpmn:outgoing>F1</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="gate" name="Demande recevable ?">
+      <bpmn:incoming>F1</bpmn:incoming>
+      <bpmn:outgoing>F2</bpmn:outgoing>
+      <bpmn:outgoing>F3</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="reject" name="Demande refusée">
+      <bpmn:incoming>F2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="kind" name="Retour après livraison ?">
+      <bpmn:incoming>F3</bpmn:incoming>
+      <bpmn:outgoing>F4</bpmn:outgoing>
+      <bpmn:outgoing>F5</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="cancel" name="Enregistrer la demande d’annulation">
+      <bpmn:incoming>F4</bpmn:incoming>
+      <bpmn:outgoing>F6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="returned" name="Enregistrer la demande de retour">
+      <bpmn:incoming>F5</bpmn:incoming>
+      <bpmn:outgoing>F7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="join">
+      <bpmn:incoming>F6</bpmn:incoming>
+      <bpmn:incoming>F7</bpmn:incoming>
+      <bpmn:outgoing>F8</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="notify" name="Transmettre les informations aux modules concernés">
+      <bpmn:incoming>F8</bpmn:incoming>
+      <bpmn:outgoing>F9</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="event" name="Résultat des traitements reçu">
+      <bpmn:incoming>F9</bpmn:incoming>
+      <bpmn:outgoing>F10</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="Msg_event" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="close" name="Mettre à jour le dossier commercial">
+      <bpmn:incoming>F10</bpmn:incoming>
+      <bpmn:outgoing>F11</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="end" name="Demande traitée">
+      <bpmn:incoming>F11</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="F0" sourceRef="s" targetRef="review" />
+    <bpmn:sequenceFlow id="F1" sourceRef="review" targetRef="gate" />
+    <bpmn:sequenceFlow id="F2" sourceRef="gate" targetRef="reject" name="Non" />
+    <bpmn:sequenceFlow id="F3" sourceRef="gate" targetRef="kind" name="Oui" />
+    <bpmn:sequenceFlow id="F4" sourceRef="kind" targetRef="cancel" name="Non" />
+    <bpmn:sequenceFlow id="F5" sourceRef="kind" targetRef="returned" name="Oui" />
+    <bpmn:sequenceFlow id="F6" sourceRef="cancel" targetRef="join" />
+    <bpmn:sequenceFlow id="F7" sourceRef="returned" targetRef="join" />
+    <bpmn:sequenceFlow id="F8" sourceRef="join" targetRef="notify" />
+    <bpmn:sequenceFlow id="F9" sourceRef="notify" targetRef="event" />
+    <bpmn:sequenceFlow id="F10" sourceRef="event" targetRef="close" />
+    <bpmn:sequenceFlow id="F11" sourceRef="close" targetRef="end" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram">
+    <bpmndi:BPMNPlane id="Plane" bpmnElement="Processus">
+      <bpmndi:BPMNShape id="S_s" bpmnElement="s">
+        <dc:Bounds x="50" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_review" bpmnElement="review">
+        <dc:Bounds x="130" y="170" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_gate" bpmnElement="gate">
+        <dc:Bounds x="350" y="185" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_reject" bpmnElement="reject">
+        <dc:Bounds x="357" y="315" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_kind" bpmnElement="kind">
+        <dc:Bounds x="470" y="185" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_cancel" bpmnElement="cancel">
+        <dc:Bounds x="590" y="65" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_returned" bpmnElement="returned">
+        <dc:Bounds x="590" y="290" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_join" bpmnElement="join">
+        <dc:Bounds x="810" y="185" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_notify" bpmnElement="notify">
+        <dc:Bounds x="910" y="170" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_event" bpmnElement="event">
+        <dc:Bounds x="1130" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_close" bpmnElement="close">
+        <dc:Bounds x="1240" y="170" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_end" bpmnElement="end">
+        <dc:Bounds x="1460" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="E0" bpmnElement="F0">
+        <di:waypoint x="86" y="210" />
+        <di:waypoint x="130" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E1" bpmnElement="F1">
+        <di:waypoint x="290" y="210" />
+        <di:waypoint x="350" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E2" bpmnElement="F2">
+        <di:waypoint x="375" y="235" />
+        <di:waypoint x="375" y="315" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E3" bpmnElement="F3">
+        <di:waypoint x="400" y="210" />
+        <di:waypoint x="470" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E4" bpmnElement="F4">
+        <di:waypoint x="495" y="185" />
+        <di:waypoint x="495" y="105" />
+        <di:waypoint x="590" y="105" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E5" bpmnElement="F5">
+        <di:waypoint x="495" y="235" />
+        <di:waypoint x="495" y="330" />
+        <di:waypoint x="590" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E6" bpmnElement="F6">
+        <di:waypoint x="750" y="105" />
+        <di:waypoint x="835" y="105" />
+        <di:waypoint x="835" y="185" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E7" bpmnElement="F7">
+        <di:waypoint x="750" y="330" />
+        <di:waypoint x="835" y="330" />
+        <di:waypoint x="835" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E8" bpmnElement="F8">
+        <di:waypoint x="860" y="210" />
+        <di:waypoint x="910" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E9" bpmnElement="F9">
+        <di:waypoint x="1070" y="210" />
+        <di:waypoint x="1130" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E10" bpmnElement="F10">
+        <di:waypoint x="1166" y="210" />
+        <di:waypoint x="1240" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E11" bpmnElement="F11">
+        <di:waypoint x="1400" y="210" />
+        <di:waypoint x="1460" y="210" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

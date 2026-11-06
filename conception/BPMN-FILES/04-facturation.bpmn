@@ -1,0 +1,188 @@
+<?xml version='1.0' encoding='utf-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Defs" targetNamespace="https://example.org/erp/ventes">
+  <bpmn:process id="Processus" name="Facturation et intégration comptable" isExecutable="false">
+    <bpmn:startEvent id="s" name="Commande facturable">
+      <bpmn:outgoing>F0</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="policy" name="Vérifier la politique de facturation">
+      <bpmn:incoming>F0</bpmn:incoming>
+      <bpmn:outgoing>F1</bpmn:outgoing>
+      <bpmn:incoming>F3</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="trigger" name="Condition de facturation atteinte ?">
+      <bpmn:incoming>F1</bpmn:incoming>
+      <bpmn:outgoing>F2</bpmn:outgoing>
+      <bpmn:outgoing>F4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:intermediateCatchEvent id="wait" name="Événement attendu reçu">
+      <bpmn:incoming>F2</bpmn:incoming>
+      <bpmn:outgoing>F3</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="Msg_wait" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="invoice" name="Préparer la facture de vente">
+      <bpmn:incoming>F4</bpmn:incoming>
+      <bpmn:outgoing>F5</bpmn:outgoing>
+      <bpmn:incoming>F7</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="valid" name="Facture valide ?">
+      <bpmn:incoming>F5</bpmn:incoming>
+      <bpmn:outgoing>F6</bpmn:outgoing>
+      <bpmn:outgoing>F8</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="correct" name="Corriger les données de facturation">
+      <bpmn:incoming>F6</bpmn:incoming>
+      <bpmn:outgoing>F7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="issue" name="Émettre la facture au client">
+      <bpmn:incoming>F8</bpmn:incoming>
+      <bpmn:outgoing>F9</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="integr" name="Comptabilité intégrée ?">
+      <bpmn:incoming>F9</bpmn:incoming>
+      <bpmn:outgoing>F10</bpmn:outgoing>
+      <bpmn:outgoing>F11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="send" name="Transmettre les informations comptables">
+      <bpmn:incoming>F10</bpmn:incoming>
+      <bpmn:outgoing>F12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="manual" name="Organiser le traitement comptable externe">
+      <bpmn:incoming>F11</bpmn:incoming>
+      <bpmn:outgoing>F13</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="join">
+      <bpmn:incoming>F12</bpmn:incoming>
+      <bpmn:incoming>F13</bpmn:incoming>
+      <bpmn:outgoing>F14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="end" name="Facture émise et traitement transmis">
+      <bpmn:incoming>F14</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="F0" sourceRef="s" targetRef="policy" />
+    <bpmn:sequenceFlow id="F1" sourceRef="policy" targetRef="trigger" />
+    <bpmn:sequenceFlow id="F2" sourceRef="trigger" targetRef="wait" name="Non" />
+    <bpmn:sequenceFlow id="F3" sourceRef="wait" targetRef="policy" />
+    <bpmn:sequenceFlow id="F4" sourceRef="trigger" targetRef="invoice" name="Oui" />
+    <bpmn:sequenceFlow id="F5" sourceRef="invoice" targetRef="valid" />
+    <bpmn:sequenceFlow id="F6" sourceRef="valid" targetRef="correct" name="Non" />
+    <bpmn:sequenceFlow id="F7" sourceRef="correct" targetRef="invoice" />
+    <bpmn:sequenceFlow id="F8" sourceRef="valid" targetRef="issue" name="Oui" />
+    <bpmn:sequenceFlow id="F9" sourceRef="issue" targetRef="integr" />
+    <bpmn:sequenceFlow id="F10" sourceRef="integr" targetRef="send" name="Oui" />
+    <bpmn:sequenceFlow id="F11" sourceRef="integr" targetRef="manual" name="Non" />
+    <bpmn:sequenceFlow id="F12" sourceRef="send" targetRef="join" />
+    <bpmn:sequenceFlow id="F13" sourceRef="manual" targetRef="join" />
+    <bpmn:sequenceFlow id="F14" sourceRef="join" targetRef="end" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram">
+    <bpmndi:BPMNPlane id="Plane" bpmnElement="Processus">
+      <bpmndi:BPMNShape id="S_s" bpmnElement="s">
+        <dc:Bounds x="50" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_policy" bpmnElement="policy">
+        <dc:Bounds x="130" y="170" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_trigger" bpmnElement="trigger">
+        <dc:Bounds x="350" y="185" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_wait" bpmnElement="wait">
+        <dc:Bounds x="357" y="315" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_invoice" bpmnElement="invoice">
+        <dc:Bounds x="470" y="170" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_valid" bpmnElement="valid">
+        <dc:Bounds x="690" y="185" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_correct" bpmnElement="correct">
+        <dc:Bounds x="810" y="50" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_issue" bpmnElement="issue">
+        <dc:Bounds x="810" y="170" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_integr" bpmnElement="integr">
+        <dc:Bounds x="1030" y="185" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_send" bpmnElement="send">
+        <dc:Bounds x="1150" y="65" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_manual" bpmnElement="manual">
+        <dc:Bounds x="1150" y="290" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_join" bpmnElement="join">
+        <dc:Bounds x="1370" y="185" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="S_end" bpmnElement="end">
+        <dc:Bounds x="1480" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="E0" bpmnElement="F0">
+        <di:waypoint x="86" y="210" />
+        <di:waypoint x="130" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E1" bpmnElement="F1">
+        <di:waypoint x="290" y="210" />
+        <di:waypoint x="350" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E2" bpmnElement="F2">
+        <di:waypoint x="375" y="235" />
+        <di:waypoint x="375" y="315" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E3" bpmnElement="F3">
+        <di:waypoint x="357" y="333" />
+        <di:waypoint x="210" y="333" />
+        <di:waypoint x="210" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E4" bpmnElement="F4">
+        <di:waypoint x="400" y="210" />
+        <di:waypoint x="470" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E5" bpmnElement="F5">
+        <di:waypoint x="630" y="210" />
+        <di:waypoint x="690" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E6" bpmnElement="F6">
+        <di:waypoint x="715" y="185" />
+        <di:waypoint x="715" y="90" />
+        <di:waypoint x="810" y="90" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E7" bpmnElement="F7">
+        <di:waypoint x="890" y="50" />
+        <di:waypoint x="890" y="10" />
+        <di:waypoint x="550" y="10" />
+        <di:waypoint x="550" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E8" bpmnElement="F8">
+        <di:waypoint x="740" y="210" />
+        <di:waypoint x="810" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E9" bpmnElement="F9">
+        <di:waypoint x="970" y="210" />
+        <di:waypoint x="1030" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E10" bpmnElement="F10">
+        <di:waypoint x="1055" y="185" />
+        <di:waypoint x="1055" y="105" />
+        <di:waypoint x="1150" y="105" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E11" bpmnElement="F11">
+        <di:waypoint x="1055" y="235" />
+        <di:waypoint x="1055" y="330" />
+        <di:waypoint x="1150" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E12" bpmnElement="F12">
+        <di:waypoint x="1310" y="105" />
+        <di:waypoint x="1395" y="105" />
+        <di:waypoint x="1395" y="185" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E13" bpmnElement="F13">
+        <di:waypoint x="1310" y="330" />
+        <di:waypoint x="1395" y="330" />
+        <di:waypoint x="1395" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E14" bpmnElement="F14">
+        <di:waypoint x="1420" y="210" />
+        <di:waypoint x="1480" y="210" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
